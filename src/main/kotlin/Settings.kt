@@ -7,6 +7,17 @@ import java.io.FileInputStream
 import java.util.*
 import kotlin.system.exitProcess
 
+private var _settings: Settings? = null
+val settings get() = _settings!!
+
+fun initSettings(args: Array<String>) {
+    val commandLineArgumentSettings = CommandLineArgumentSettings(args)
+    val environmentSettings = EnvironmentSettings()
+    val propertiesSettings = PropertiesSettings(loadPropertiesFile("settings.properties"))
+    val settingsJoin = SettingsJoin(listOf(commandLineArgumentSettings, environmentSettings, propertiesSettings))
+    _settings = Settings(settingsJoin)
+}
+
 interface SettingsSource {
 
     val debugEnabled: Boolean
@@ -18,6 +29,8 @@ interface SettingsSource {
     val providerGithub: String?
     val repoPrefix: String?
     val repoDirPrefix: String?
+    val task: String?
+    val baseName: String?
 
 }
 
@@ -33,6 +46,8 @@ class CommandLineArgumentSettings(val args: Array<String>) : SettingsSource {
     override val providerGithub: String?
     override val repoPrefix: String?
     override val repoDirPrefix: String?
+    override val task: String?
+    override val baseName: String?
 
 
     init {
@@ -40,13 +55,15 @@ class CommandLineArgumentSettings(val args: Array<String>) : SettingsSource {
         options.addOption("h", "help", false, "Prints this message")
         options.addOption("d", "debug", false, "Prints debug information")
 
-        options.addOption("sid", "STUDENT_ID", true, "Student ID")
-        options.addOption("fn", "FIRST_NAME", true, "First Name")
-        options.addOption("ln", "LAST_NAME", true, "Last Name")
-        options.addOption("gn", "GITHUB_USERNAME", true, "Github Username")
-        options.addOption("pg", "PROVIDER_GITHUB", true, "Provider Github Username")
-        options.addOption("pref", "REPO_PREFIX", true, "Repository Prefix")
-        options.addOption("dpref", "REPO_DIR_PREFIX", true, "Repository Directory Prefix")
+        options.addOption("sid", "student-id", true, "Student ID")
+        options.addOption("fn", "first-name", true, "First Name")
+        options.addOption("ln", "last-name", true, "Last Name")
+        options.addOption("gn", "github-username", true, "Github Username")
+        options.addOption("pg", "provider-github", true, "Provider Github Username")
+        options.addOption("pref", "repo-prefix", true, "Repository Prefix")
+        options.addOption("dpref", "repo-dir-prefix", true, "Repository Directory Prefix")
+        options.addOption("t", "task", true, "Task number (00, 01, 02, ...)")
+        options.addOption("bn", "base-name", true, "Base name")
 
         val parser = DefaultParser()
         val cmd = parser.parse(options, args)
@@ -68,6 +85,9 @@ class CommandLineArgumentSettings(val args: Array<String>) : SettingsSource {
         providerGithub = cmd.getOptionValue("pg")
         repoPrefix = cmd.getOptionValue("pref")
         repoDirPrefix = cmd.getOptionValue("dpref")
+        task = cmd.getOptionValue("t")
+        baseName = cmd.getOptionValue("bn")
+
     }
 }
 
@@ -81,6 +101,8 @@ class EnvironmentSettings : SettingsSource {
     override val providerGithub: String? = System.getenv("PROVIDER_GITHUB")
     override val repoPrefix: String? = System.getenv("REPO_PREFIX")
     override val repoDirPrefix: String? = System.getenv("REPO_DIR_PREFIX")
+    override val task: String? = System.getenv("TASK")
+    override val baseName: String? = System.getenv("BASE_NAME")
 
 }
 
@@ -94,6 +116,9 @@ class PropertiesSettings(val properties: Properties?): SettingsSource {
     override val providerGithub: String? = properties?.getProperty("PROVIDER_GITHUB")
     override val repoPrefix: String? = properties?.getProperty("REPO_PREFIX")
     override val repoDirPrefix: String? = properties?.getProperty("REPO_DIR_PREFIX")
+    override val task: String? = properties?.getProperty("TASK")
+    override val baseName: String? = properties?.getProperty("BASE_NAME")
+
 }
 
 class SettingsJoin(
@@ -108,6 +133,8 @@ class SettingsJoin(
     override val providerGithub: String? = settingsSource.firstNotNullOfOrNull { it.providerGithub }
     override val repoPrefix: String? = settingsSource.firstNotNullOfOrNull { it.repoPrefix }
     override val repoDirPrefix: String? = settingsSource.firstNotNullOfOrNull { it.repoDirPrefix }
+    override val task: String? = settingsSource.firstNotNullOfOrNull { it.task }
+    override val baseName: String? = settingsSource.firstNotNullOfOrNull { it.baseName }
 
 }
 
@@ -122,6 +149,31 @@ class Settings(
     val providerGithub: String = settingsSource.providerGithub ?: throw RuntimeException("Provider Github is required")
     val repoPrefix: String = settingsSource.repoPrefix ?: throw RuntimeException("Repository Prefix is required")
     val repoDirPrefix: String = settingsSource.repoDirPrefix ?: throw RuntimeException("Repository Directory Prefix is required")
+    val task: String = settingsSource.task ?: throw RuntimeException("Task is required")
+    val baseName: String = settingsSource.baseName ?: throw RuntimeException("Base Name is required")
+
+    val repoName: String = "$baseName$task"
+
+    val myRepoName: String = "$repoPrefix$repoName"
+    val localRepoDirName: String = "$repoDirPrefix$repoName"
+    val localRepoDir = file(localRepoDirName)
+    val myRepo: String = "$githubUsername/$repoName"
+
+    val originalRepo: String = "$providerGithub/$repoName"
+
+    val myRepoUrl: String = getRepoUrl()
+    val originalRepoUrl: String = "https://github.com/$originalRepo.git"
+
+    private fun getRepoUrl(): String {
+        if(System.getenv("CI") != null) {
+            val GITHUB_TOKEN = System.getenv("GITHUB_TOKEN")
+                ?: throw Exception("GITHUB_TOKEN is not set, but we are in a CI environment")
+
+            return "https://${GITHUB_TOKEN}@github.com/$myRepo.git"
+        }
+        else return "https://github.com/$myRepo.git"
+    }
+
 }
 
 fun loadPropertiesFile(path: String): Properties? {
