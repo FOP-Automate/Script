@@ -109,7 +109,7 @@ class GitClient(
      * @param path the path of the file
      */
     fun addFile(path: String) {
-        executeGitCommand("add", path)
+        executeGitCommand("add", "--", path)
     }
 
     /**
@@ -127,7 +127,7 @@ class GitClient(
      * @param paths the paths of the files
      */
     fun addFiles(vararg paths: String) {
-        executeGitCommand("add", *paths)
+        executeGitCommand("add", "--", *paths)
     }
 
     /**
@@ -157,7 +157,8 @@ class GitClient(
         // Check if the files are changed
         if (paths.none { changed(it) }) return false
 
-        executeGitCommand("add", *paths)
+        // Add the files
+        addFiles(*paths)
 
         // Commit the changes
         executeGitCommand("commit", "-m", message, *paths)
