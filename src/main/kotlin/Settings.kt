@@ -2,6 +2,8 @@ package org.example
 
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
+import java.io.File
+import java.io.FileInputStream
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -120,4 +122,11 @@ class Settings(
     val providerGithub: String = settingsSource.providerGithub ?: throw RuntimeException("Provider Github is required")
     val repoPrefix: String = settingsSource.repoPrefix ?: throw RuntimeException("Repository Prefix is required")
     val repoDirPrefix: String = settingsSource.repoDirPrefix ?: throw RuntimeException("Repository Directory Prefix is required")
+}
+
+fun loadPropertiesFile(path: String): Properties? {
+    if(!File(path).exists()) return null
+    val properties = Properties()
+    properties.load(FileInputStream(path))
+    return properties
 }
