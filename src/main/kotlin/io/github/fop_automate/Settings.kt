@@ -1,4 +1,4 @@
-package org.example
+package io.github.fop_automate
 
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options

@@ -2,7 +2,18 @@ plugins {
     kotlin("jvm") version "1.9.22"
 }
 
-group = "org.example"
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath("com.github.johnrengelman:shadow:8.1.1")
+    }
+}
+
+apply(plugin="com.github.johnrengelman.shadow")
+
+group = "com.github.fop-automate"
 version = "1.0-SNAPSHOT"
 
 repositories {

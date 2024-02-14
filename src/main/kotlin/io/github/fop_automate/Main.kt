@@ -1,4 +1,4 @@
-package org.example
+package io.github.fop_automate
 
 fun main(args: Array<String>) {
 
@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
         settings.localRepoDir
     )
 
-    gitClient.ensureClone(url=settings.originalRepoUrl)
+    gitClient.ensureClone(url= settings.originalRepoUrl)
 
     gitClient.setRemote("origin", settings.myRepoUrl)
     gitClient.setRemote("upstream", settings.originalRepoUrl)

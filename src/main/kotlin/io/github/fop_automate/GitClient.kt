@@ -1,4 +1,4 @@
-package org.example
+package io.github.fop_automate
 
 import java.io.File
 
