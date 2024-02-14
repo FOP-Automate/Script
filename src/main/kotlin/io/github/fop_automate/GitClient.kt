@@ -187,8 +187,8 @@ class GitClient(
     ) {
         val args = mutableListOf("push")
         if (mirror) args.add("--mirror")
-        args.add(remote)
-        args.add("${branch}:${originBranch}")
+        if(!mirror) args.add(remote)
+        if(!mirror) args.add("${branch}:${originBranch}")
         executeGitCommand(*args.toTypedArray())
     }
 
@@ -308,7 +308,10 @@ class GitClient(
             javaClass.getResourceAsStream(resource) ?: throw IllegalArgumentException("Resource not found: $resource")
         val file = File(repository, path)
         file.parentFile.mkdirs()
-        file.outputStream().use { resourceStream.copyTo(it) }
+        file.outputStream().use {
+            resourceStream.copyTo(it)
+            resourceStream.close()
+        }
     }
 
 }

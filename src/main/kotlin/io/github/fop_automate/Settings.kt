@@ -32,6 +32,7 @@ interface SettingsSource {
     val task: String?
     val baseName: String?
     val baseSuffix: String?
+    val pdfBase: String?
 
 }
 
@@ -50,6 +51,7 @@ class CommandLineArgumentSettings(val args: Array<String>) : SettingsSource {
     override val task: String?
     override val baseName: String?
     override val baseSuffix: String?
+    override val pdfBase: String?
 
 
     init {
@@ -67,6 +69,7 @@ class CommandLineArgumentSettings(val args: Array<String>) : SettingsSource {
         options.addOption("t", "task", true, "Task number (00, 01, 02, ...)")
         options.addOption("bn", "base-name", true, "Base name")
         options.addOption("bs", "base-suffix", true, "Base suffix")
+        options.addOption("pdf", "pdf-base", true, "PDF base name")
 
         val parser = DefaultParser()
         val cmd = parser.parse(options, args)
@@ -91,6 +94,7 @@ class CommandLineArgumentSettings(val args: Array<String>) : SettingsSource {
         task = cmd.getOptionValue("t")
         baseName = cmd.getOptionValue("bn")
         baseSuffix = cmd.getOptionValue("bs")
+        pdfBase = cmd.getOptionValue("pdf")
 
     }
 }
@@ -108,6 +112,7 @@ class EnvironmentSettings : SettingsSource {
     override val baseName: String? = System.getenv("BASE_NAME")
     override val task: String? = System.getenv("TASK")
     override val baseSuffix: String? = System.getenv("BASE_SUFFIX")
+    override val pdfBase: String? = System.getenv("PDF_BASE")
 
 }
 
@@ -124,6 +129,7 @@ class PropertiesSettings(val properties: Properties?): SettingsSource {
     override val task: String? = properties?.getProperty("TASK")
     override val baseName: String? = properties?.getProperty("BASE_NAME")
     override val baseSuffix: String? = properties?.getProperty("BASE_SUFFIX")
+    override val pdfBase: String? = properties?.getProperty("PDF_BASE")
 
 }
 
@@ -142,6 +148,7 @@ class SettingsJoin(
     override val task: String? = settingsSource.firstNotNullOfOrNull { it.task }
     override val baseName: String? = settingsSource.firstNotNullOfOrNull { it.baseName }
     override val baseSuffix: String? = settingsSource.firstNotNullOfOrNull { it.baseSuffix }
+    override val pdfBase: String? = settingsSource.firstNotNullOfOrNull { it.pdfBase }
 
 }
 
@@ -159,8 +166,10 @@ class Settings(
     val task: String = settingsSource.task ?: throw RuntimeException("Task is required")
     val baseName: String = settingsSource.baseName ?: throw RuntimeException("Base Name is required")
     val baseSuffix: String = settingsSource.baseSuffix ?: throw RuntimeException("Base Suffix is required")
+    val pdfBase: String = settingsSource.pdfBase ?: throw RuntimeException("PDF Base is required")
 
     val repoName: String = "$baseName$task$baseSuffix"
+    val repoNameNoSuffix: String = "$baseName$task"
 
     val myRepoName: String = "$repoPrefix$repoName"
     val localRepoDirName: String = "$repoDirPrefix$repoName"
@@ -168,6 +177,7 @@ class Settings(
     val myRepo: String = "$githubUsername/$myRepoName"
 
     val originalRepo: String = "$providerGithub/$repoName"
+    val originalRepoNoSuffix: String = "$providerGithub/$repoNameNoSuffix"
 
     val myRepoUrl: String = getRepoUrl()
     val originalRepoUrl: String = "https://github.com/$originalRepo.git"
