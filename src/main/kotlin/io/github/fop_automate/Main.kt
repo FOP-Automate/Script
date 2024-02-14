@@ -18,7 +18,10 @@ fun main(args: Array<String>) {
 
     gitClient.ensureOriginRepository(private = true)
 
-    gitClient.copyResource("resources/workflows/build.yml", ".github/workflows/build.yml")
+    gitClient.copyResource("/resources/workflows/build.yml", ".github/workflows/build.yml")
+    gitClient.commit("Add build workflow", "\".github/workflows/build.yml\"")
+
+    gitClient.push()
 
 
 }

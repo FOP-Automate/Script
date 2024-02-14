@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.22"
+    application
 }
 
 buildscript {
@@ -30,4 +31,11 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(17)
+}
+
+application {
+    mainClass.set("io.github.fop_automate.MainKt")
+}
+run {
+
 }

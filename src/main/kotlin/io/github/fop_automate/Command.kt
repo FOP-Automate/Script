@@ -7,14 +7,10 @@ fun executeCommand(command: String, vararg args: String, cwd: String? = null): S
     println("> $command ${args.joinToString(" ")}")
     val process = runtime.exec(arrayOf(command, *args), null, cwd?.let { File(it) })
     process.waitFor()
-    if(process.exitValue() != 0) {
-        throw RuntimeException("Command $args failed with exit code ${process.exitValue()}")
-    }
-
     val output = process.inputStream.bufferedReader().readText()
     val error = process.errorStream.bufferedReader().readText()
-    if(error.isNotEmpty()) {
-        throw RuntimeException("Command $args failed with error: $error")
+    if(process.exitValue() != 0) {
+        throw RuntimeException("Command \"$command ${args.joinToString(" ")}\" failed with exit code ${process.exitValue()} and error: $error")
     }
 
     process.destroy()

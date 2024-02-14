@@ -31,6 +31,7 @@ interface SettingsSource {
     val repoDirPrefix: String?
     val task: String?
     val baseName: String?
+    val baseSuffix: String?
 
 }
 
@@ -48,6 +49,7 @@ class CommandLineArgumentSettings(val args: Array<String>) : SettingsSource {
     override val repoDirPrefix: String?
     override val task: String?
     override val baseName: String?
+    override val baseSuffix: String?
 
 
     init {
@@ -64,6 +66,7 @@ class CommandLineArgumentSettings(val args: Array<String>) : SettingsSource {
         options.addOption("dpref", "repo-dir-prefix", true, "Repository Directory Prefix")
         options.addOption("t", "task", true, "Task number (00, 01, 02, ...)")
         options.addOption("bn", "base-name", true, "Base name")
+        options.addOption("bs", "base-suffix", true, "Base suffix")
 
         val parser = DefaultParser()
         val cmd = parser.parse(options, args)
@@ -87,6 +90,7 @@ class CommandLineArgumentSettings(val args: Array<String>) : SettingsSource {
         repoDirPrefix = cmd.getOptionValue("dpref")
         task = cmd.getOptionValue("t")
         baseName = cmd.getOptionValue("bn")
+        baseSuffix = cmd.getOptionValue("bs")
 
     }
 }
@@ -101,8 +105,9 @@ class EnvironmentSettings : SettingsSource {
     override val providerGithub: String? = System.getenv("PROVIDER_GITHUB")
     override val repoPrefix: String? = System.getenv("REPO_PREFIX")
     override val repoDirPrefix: String? = System.getenv("REPO_DIR_PREFIX")
-    override val task: String? = System.getenv("TASK")
     override val baseName: String? = System.getenv("BASE_NAME")
+    override val task: String? = System.getenv("TASK")
+    override val baseSuffix: String? = System.getenv("BASE_SUFFIX")
 
 }
 
@@ -118,6 +123,7 @@ class PropertiesSettings(val properties: Properties?): SettingsSource {
     override val repoDirPrefix: String? = properties?.getProperty("REPO_DIR_PREFIX")
     override val task: String? = properties?.getProperty("TASK")
     override val baseName: String? = properties?.getProperty("BASE_NAME")
+    override val baseSuffix: String? = properties?.getProperty("BASE_SUFFIX")
 
 }
 
@@ -135,6 +141,7 @@ class SettingsJoin(
     override val repoDirPrefix: String? = settingsSource.firstNotNullOfOrNull { it.repoDirPrefix }
     override val task: String? = settingsSource.firstNotNullOfOrNull { it.task }
     override val baseName: String? = settingsSource.firstNotNullOfOrNull { it.baseName }
+    override val baseSuffix: String? = settingsSource.firstNotNullOfOrNull { it.baseSuffix }
 
 }
 
@@ -151,13 +158,14 @@ class Settings(
     val repoDirPrefix: String = settingsSource.repoDirPrefix ?: throw RuntimeException("Repository Directory Prefix is required")
     val task: String = settingsSource.task ?: throw RuntimeException("Task is required")
     val baseName: String = settingsSource.baseName ?: throw RuntimeException("Base Name is required")
+    val baseSuffix: String = settingsSource.baseSuffix ?: throw RuntimeException("Base Suffix is required")
 
-    val repoName: String = "$baseName$task"
+    val repoName: String = "$baseName$task$baseSuffix"
 
     val myRepoName: String = "$repoPrefix$repoName"
     val localRepoDirName: String = "$repoDirPrefix$repoName"
     val localRepoDir = file(localRepoDirName)
-    val myRepo: String = "$githubUsername/$repoName"
+    val myRepo: String = "$githubUsername/$myRepoName"
 
     val originalRepo: String = "$providerGithub/$repoName"
 
