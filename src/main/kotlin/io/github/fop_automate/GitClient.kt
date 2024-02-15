@@ -1,6 +1,7 @@
 package io.github.fop_automate
 
 import java.io.File
+import javax.management.loading.ClassLoaderRepository
 
 /**
  * A class to interact with a git repository
@@ -46,35 +47,7 @@ class GitClient(
      * @return the url of the remote
      */
     fun getRemoteUrl(name: String): String? {
-        return executeGitCommand("remote", "get-url", name).ifBlank { null }
-    }
-
-    /**
-     * Execute a git command
-     * @param args the arguments of the command
-     * @return the output of the command
-     */
-    fun executeGitCommand(vararg args: String): String {
-        return executeCommand("git", *args)
-    }
-
-    /**
-     * Execute a gh command
-     * @param args the arguments of the command
-     * @return the output of the command
-     */
-    fun executeGHCommand(vararg args: String): String {
-        return executeCommand("gh", *args)
-    }
-
-    /**
-     * Execute a command
-     * @param command the command to execute
-     * @param args the arguments of the command
-     * @return the output of the command
-     */
-    fun executeCommand(command: String, vararg args: String): String {
-        return executeCommand(command, *args, cwd = repository.path)
+        return executeGitCommand("remote", "get-url", name).ifBlank { null }.stripNewLines()
     }
 
     /**
@@ -166,13 +139,13 @@ class GitClient(
     }
 
     fun getMainBranch(): String {
-        return executeGitCommand("branch", "--show-current").replace(Regex("[\n\r]"), "")
+        return executeGitCommand("branch", "--show-current").stripNewLines()
     }
 
     fun getOriginMainBranch(): String {
         return (executeGitCommand("remote", "show", "origin", "-n")
             .lines()
-            .find { it.startsWith("HEAD branch") }?.split(":")?.get(1)?.trim() ?: "main").replace(Regex("[\n\r]"), "")
+            .find { it.startsWith("HEAD branch") }?.split(":")?.get(1)?.trim() ?: "main").stripNewLines()
     }
 
     /**
@@ -207,6 +180,26 @@ class GitClient(
      */
     fun ensureClone(url: String = originUrl, directory: File = repository) {
         if (!directory.exists()) clone(url, directory)
+    }
+
+    /**
+     * Initialize the repository
+     */
+    fun init() {
+        repository.mkdirs()
+        executeGitCommand("init")
+    }
+
+    /**
+     * Ensure the repository is initialized
+     * @return true if the repository was initialized
+     */
+    fun ensureInit(): Boolean {
+        if(!File(repository, ".git").exists()){
+            init()
+            return true
+        }
+        return false
     }
 
     /**
@@ -300,6 +293,8 @@ class GitClient(
     fun mkdirs(path: String) =
         File(repository, path).mkdirs()
 
+    fun mkdirs() = repository.mkdirs()
+
     /**
      * Copy a resource to the repository
      */
@@ -314,4 +309,37 @@ class GitClient(
         }
     }
 
+    /**
+     * Execute a git command
+     * @param args the arguments of the command
+     * @return the output of the command
+     */
+    fun executeGitCommand(vararg args: String): String {
+        return executeCommand("git", *args)
+    }
+
+    /**
+     * Execute a gh command
+     * @param args the arguments of the command
+     * @return the output of the command
+     */
+    fun executeGHCommand(vararg args: String): String {
+        return executeCommand("gh", *args)
+    }
+
+    /**
+     * Execute a command
+     * @param command the command to execute
+     * @param args the arguments of the command
+     * @return the output of the command
+     */
+    fun executeCommand(command: String, vararg args: String): String {
+        return executeCommand(command, *args, cwd = repository.path)
+    }
+
 }
+
+fun String.stripNewLines() = replace(Regex("[\n\r]"), "")
+
+@JvmName("stripNewLinesNullable")
+fun String?.stripNewLines() = this?.stripNewLines()
