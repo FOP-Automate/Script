@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import java.io.File
 
 
 class TempRepository(
@@ -303,21 +304,21 @@ class GitClientTests : FreeSpec({
         }
 
         "clone" {
-            val tempdir = tempdir()
+            val tempdir = File(tempdir(), "clone")
             val git = GitClient("https://github.com/FOP-Automate/Script.git", tempdir)
             git.clone()
             git.file("build.gradle.kts").exists() shouldBe true
         }
 
         "clone (custom)" {
-            val tempdir = tempdir()
+            val tempdir = File(tempdir(), "clone")
             val git = GitClient("https://example.com/repo.git", tempdir)
             git.clone("https://github.com/FOP-Automate/Script.git")
             git.file("build.gradle.kts").exists() shouldBe true
         }
 
         "ensure clone" {
-            val tempdir = tempdir()
+            val tempdir = File(tempdir(), "clone")
             val git = GitClient("https://github.com/FOP-Automate/Script.git", tempdir)
             git.clone()
             git.clone()
@@ -325,7 +326,7 @@ class GitClientTests : FreeSpec({
         }
 
         "ensure clone (custom)" {
-            val tempdir = tempdir()
+            val tempdir = File(tempdir(), "clone")
             val git = GitClient("https://example.com/repo.git", tempdir)
             git.ensureClone("https://github.com/FOP-Automate/Script.git")
             git.ensureClone("https://github.com/FOP-Automate/Script.git")
