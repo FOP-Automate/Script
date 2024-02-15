@@ -59,7 +59,7 @@ class CreationTests : FreeSpec({
                     FIRST_NAME=Harry
                     LAST_NAME=Potter
                     GITHUB_USERNAME=FOP-Automate
-                    PROVIDER_GITHUB=FOP-2324
+                    PROVIDER_GITHUB=FOP-2223
                     REPO_PREFIX=temp-repo-$prefix-
                     REPO_DIR_PREFIX=temp-repo-$prefix-
                     BASE_NAME=FOP-2324-
