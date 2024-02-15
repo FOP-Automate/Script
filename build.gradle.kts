@@ -37,5 +37,9 @@ kotlin {
 }
 
 application {
-    mainClass.set("io.github.fop_automate.CreateKt")
+    mainClass.set("io.github.fop_automate.create.CreateKt")
+}
+
+tasks.build {
+    dependsOn("shadowJar")
 }
