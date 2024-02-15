@@ -320,8 +320,8 @@ class GitClientTests : FreeSpec({
         "ensure clone" {
             val tempdir = File(tempdir(), "clone")
             val git = GitClient("https://github.com/FOP-Automate/Script.git", tempdir)
-            git.clone()
-            git.clone()
+            git.ensureClone()
+            git.ensureClone()
             git.file("build.gradle.kts").exists() shouldBe true
         }
 

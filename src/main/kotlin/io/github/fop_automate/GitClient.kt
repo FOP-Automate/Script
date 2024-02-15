@@ -171,7 +171,7 @@ class GitClient(
     /**
      * Pull the changes of the repository
      */
-    fun clone(url: String = originUrl, directory: File = repository.parentFile) {
+    fun clone(url: String = originUrl, directory: File = repository) {
         directory.parentFile.mkdirs()
         executeCommand("git", "clone", url, directory.path, cwd = directory.parentFile.path)
     }
