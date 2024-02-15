@@ -1,5 +1,7 @@
 package io.github.fop_automate
 
+import io.github.fop_automate.api.GitClient
+import io.github.fop_automate.api.executeCommand
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe

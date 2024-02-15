@@ -1,5 +1,9 @@
 package io.github.fop_automate
 
+import io.github.fop_automate.api.CommandLineArgumentSettings
+import io.github.fop_automate.api.PropertiesSettings
+import io.github.fop_automate.api.SettingsJoin
+import io.github.fop_automate.api.SettingsSource
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import java.util.Properties

@@ -1,5 +1,7 @@
-package io.github.fop_automate
+package io.github.fop_automate.setup
 
+import io.github.fop_automate.api.GitClient
+import io.github.fop_automate.api.verifySetup
 import java.io.File
 
 

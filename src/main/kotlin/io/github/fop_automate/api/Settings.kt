@@ -1,4 +1,4 @@
-package io.github.fop_automate
+package io.github.fop_automate.api
 
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
@@ -10,10 +10,24 @@ import kotlin.system.exitProcess
 private var _settings: Settings? = null
 val settings get() = _settings!!
 
+private var _properties : PropertiesSettings? = null
+
+val properties: PropertiesSettings
+    get() {
+        if(_properties == null) {
+            _properties = PropertiesSettings(loadPropertiesFile("settings.properties"))
+        }
+        return _properties!!
+    }
+
+fun initSettingsProperties(properties: Properties) {
+    _properties = PropertiesSettings(properties)
+}
+
 fun initSettings(args: Array<String>) {
     val commandLineArgumentSettings = CommandLineArgumentSettings(args)
     val environmentSettings = EnvironmentSettings()
-    val propertiesSettings = PropertiesSettings(loadPropertiesFile("settings.properties"))
+    val propertiesSettings = properties
     val settingsJoin = SettingsJoin(listOf(commandLineArgumentSettings, environmentSettings, propertiesSettings))
     _settings = Settings(settingsJoin)
 }

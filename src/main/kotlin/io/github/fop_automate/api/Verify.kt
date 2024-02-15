@@ -1,4 +1,4 @@
-package io.github.fop_automate
+package io.github.fop_automate.api
 
 fun verifySetup() {
     verifyInstallations()

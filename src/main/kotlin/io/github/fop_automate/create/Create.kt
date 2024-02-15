@@ -1,4 +1,9 @@
-package io.github.fop_automate
+package io.github.fop_automate.create
+
+import io.github.fop_automate.api.GitClient
+import io.github.fop_automate.api.initSettings
+import io.github.fop_automate.api.settings
+import io.github.fop_automate.api.verifySetup
 
 fun main(args: Array<String>) {
 
