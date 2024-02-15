@@ -44,3 +44,4 @@ bin/
 ### Settings ###
 settings.properties
 *.xml
+.idea/
