@@ -9,7 +9,7 @@ import java.io.File
  */
 @Suppress("MemberVisibilityCanBePrivate")
 class GitClient(
-    private val originUrl: String,
+    var originUrl: String,
     repository: File,
 ) {
 
