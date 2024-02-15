@@ -1,7 +1,6 @@
 package io.github.fop_automate
 
 import java.io.File
-import javax.management.loading.ClassLoaderRepository
 
 /**
  * A class to interact with a git repository
@@ -48,6 +47,10 @@ class GitClient(
      */
     fun getRemoteUrl(name: String): String? {
         return executeGitCommand("remote", "get-url", name).ifBlank { null }.stripNewLines()
+    }
+
+    fun ensureOrigin() {
+        setRemote("origin", originUrl)
     }
 
     /**
@@ -200,14 +203,6 @@ class GitClient(
             return true
         }
         return false
-    }
-
-    /**
-     * Get the branch of the repository
-     * @return the branch of the repository
-     */
-    fun changedFiles(): List<String> {
-        return executeGitCommand("diff", "--name-only", "HEAD").lines()
     }
 
     /**
