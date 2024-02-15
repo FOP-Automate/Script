@@ -62,7 +62,7 @@ class CreationTests : FreeSpec({
                     PROVIDER_GITHUB=FOP-2223
                     REPO_PREFIX=temp-repo-$prefix-
                     REPO_DIR_PREFIX=temp-repo-$prefix-
-                    BASE_NAME=FOP-2324-
+                    BASE_NAME=FOP-2223-
                     BASE_SUFFIX=-Student
                     PDF_BASE=https://raw.githubusercontent.com/FOP-2223/FOP-2223-TeX/master/
                   """.trimIndent()
